@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Websocket</title>
+
+    <style type="text/css">
+        body {
+                font-family:    Arial;
+                font-size: 16pt;
+        }
+        input, button {
+                padding: 6px;
+        }
+    </style>
+
+</head>
+<body>
+<h1>Websocket</h1>
+
+<p>
+    Channel
+    <br />
+    <input type="text" id="channel" />
+</p>
+<p>
+    Event
+    <br />
+    <input type="text" id="event" />
+</p>
+<p>
+    <button id="subscribe" type="button">Subscribe</button>
+    <button id="unsubscribe" type="button">Unsubscribe</button>
+</p>
+
+<script>
+
+// Create WebSocket connection.
+const socket = new WebSocket("ws://localhost:7071/ws");
+
+// Listen for possible errors
+socket.addEventListener("error", (event) => {
+    console.log("WebSocket error: ", event);
+});
+
+// Connection opened
+socket.addEventListener("open", (event) => {
+    console.log("The connection has been opened successfully.");
+});
+
+socket.addEventListener("close", (event) => {
+    console.log("The connection has been closed successfully.");
+});
+
+// Listen for messages
+socket.addEventListener("message", (event) => {
+    console.log("Message from server ", event.data);
+});
+
+const channel = document.getElementById('channel');
+const event = document.getElementById('event');
+const subscribe = document.getElementById('subscribe');
+const unsubscribe = document.getElementById('unsubscribe');
+
+subscribe.addEventListener("click", (event) => {
+    sendToServer({ action: 'subscribe' });
+});
+
+unsubscribe.addEventListener("click", (event) => {
+    sendToServer({ action: 'unsubscribe' });
+});
+
+const sendToServer = (payload) => {
+    payload.channel = channel.value;
+    if (event.value.length) {
+        payload.event = event.value;
+    }
+    socket.send(JSON.stringify(payload)); 
+}
+
+</script>
+</body>
+</html>
